@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_attribute_view_form" model="ir.ui.view">
+            <field name="name">product.attribute.form.inherit.pat</field>
+            <field name="model">product.attribute</field>
+            <field name="inherit_id" ref="product.product_attribute_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='value_ids']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('display_type', '=', 'input')]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='create_variant']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('is_used_on_products', '=', True)], 'invisible': [('display_type', '=', 'input')]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='force_default_select']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('display_type', '=', 'input')]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='value_ids']" position="after">
+                    <group attrs="{'invisible': [('display_type', '!=', 'input')]}">
+                        <field name="default_value_input_type" />
+                        <field name="default_value_input_min" />
+                        <field name="default_value_input_max" />
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
