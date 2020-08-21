@@ -40,6 +40,14 @@ odoo.define('product_attribute_type', function (require) {
             }).then(function (combinationData) {
                 self._onChangeCombination(ev, $parent, combinationData);
             });
+        },
+        _onChangeCombination: function (ev, $parent, combination) {
+            if (combination.custom_value_error) {
+                $parent.find('.css_not_available_msg').html(combination.custom_value_error);
+            } else {
+                $parent.find('.css_not_available_msg').html('This combination does not exist.')
+            }
+            this._super.apply(this, arguments);
         }
     });
 });

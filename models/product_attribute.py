@@ -98,6 +98,23 @@ class ProductAttributeValue(models.Model):
                 except ValueError:
                     raise ValidationError("Max Value cannot be converted to a float")
 
+    def check_custom_value(self, custom_value):
+        """
+        This function test if custom_value follows the conditions for this attribute value
+        """
+        self.ensure_one()
+        if (self.custom_type == 'int'):
+            try:
+                int(custom_value)
+            except ValueError:
+                raise ValidationError("Custom Value [%s] cannot be converted to an integer" % custom_value)
+        if (self.custom_type == 'float'):
+            try:
+                int(custom_value)
+            except ValueError:
+                raise ValidationError("Custom Value [%s] cannot be converted to a float" % custom_value)
+        #//TODO: Handle min + max
+
 
 class ProductAttributeCustomValue(models.Model):
     _inherit = "product.attribute.custom.value"
