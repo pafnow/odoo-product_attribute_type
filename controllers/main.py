@@ -10,16 +10,17 @@ class CustomVariantController(http.Controller):
     @http.route(['/product_attribute_type/get_combination_info_custom'], type='json', auth="user", methods=['POST'])
     def get_combination_info_custom(self, product_template_id, product_id, combination, add_qty, pricelist_id, **kw):
         res = VariantController().get_combination_info(product_template_id, product_id, combination, add_qty, pricelist_id, **kw)
-        if 'custom_values' in kw:
-            for cv in kw.get('custom_values'):
-                if cv['custom_product_template_attribute_value_id'] in combination:
-                    ptav = request.env['product.template.attribute.value'].browse(cv['custom_product_template_attribute_value_id'])
-                    try:
-                        ptav.product_attribute_value_id.check_custom_value(cv['custom_value'])
-                    except ValidationError as ex:
-                        res.update({
-                            'is_combination_possible': False,
-                            'custom_value_error': ex.args[0]
-                        })
+
+        cvs = dict([(r['custom_product_template_attribute_value_id'], r['custom_value']) for r in kw.get('custom_values')])
+        for ptav in request.env['product.template.attribute.value'].browse(combination):
+            if ptav.product_attribute_value_id.is_custom:
+                try:
+                    ptav.product_attribute_value_id.check_custom_value(cvs.get(ptav.id))
+                except ValidationError as ex:
+                    res.update({
+                        'is_combination_possible': False,
+                        'custom_value_error': ex.args[0]
+                    })
+
         return res
 

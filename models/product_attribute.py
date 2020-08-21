@@ -7,7 +7,6 @@ from odoo.exceptions import ValidationError, Warning
 class ProductAttribute(models.Model):
     _inherit = "product.attribute"
 
-    #display_type = fields.Selection(selection_add=[('input', 'User Input')])
     attribute_type = fields.Selection([
         ('list', 'List'),
         ('char', 'Char'),
@@ -16,6 +15,7 @@ class ProductAttribute(models.Model):
     ], default='list', required=True, compute='_compute_attribute_type', inverse='_inverse_attribute_type')
 
     custom_value_id = fields.Many2one('product.attribute.value', compute='_compute_custom_value_id')
+    custom_value_required = fields.Boolean(related='custom_value_id.custom_required', readonly=False)
     custom_value_min = fields.Char(related='custom_value_id.custom_min', readonly=False)
     custom_value_max = fields.Char(related='custom_value_id.custom_max', readonly=False)
 
@@ -65,6 +65,7 @@ class ProductAttributeValue(models.Model):
         ('int', 'Integer'),
         ('float', 'Float'),
     ])
+    custom_required = fields.Boolean("Required")
     custom_min = fields.Char("Min Value")
     custom_max = fields.Char("Max Value")
 
@@ -103,7 +104,10 @@ class ProductAttributeValue(models.Model):
         This function test if custom_value follows the conditions for this attribute value
         """
         self.ensure_one()
-        if self.custom_type == 'int':
+        if not custom_value:
+            if self.custom_required:
+                raise ValidationError("Custom Value is required, please fill its value")
+        elif self.custom_type == 'int':
             #Type
             try:
                 int(custom_value)
@@ -115,8 +119,7 @@ class ProductAttributeValue(models.Model):
             #Max
             if self.custom_max and int(self.custom_max) < int(custom_value):
                 raise ValidationError("Custom Value [%s] is bigger than the maximum allowed [%s]" % (custom_value, self.custom_max))
-
-        if self.custom_type == 'float':
+        elif self.custom_type == 'float':
             #Type
             try:
                 float(custom_value)
