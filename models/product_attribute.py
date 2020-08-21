@@ -103,56 +103,28 @@ class ProductAttributeValue(models.Model):
         This function test if custom_value follows the conditions for this attribute value
         """
         self.ensure_one()
-        if (self.custom_type == 'int'):
+        if self.custom_type == 'int':
+            #Type
             try:
                 int(custom_value)
             except ValueError:
                 raise ValidationError("Custom Value [%s] cannot be converted to an integer" % custom_value)
-        if (self.custom_type == 'float'):
+            #Min
+            if self.custom_min and int(self.custom_min) > int(custom_value):
+                raise ValidationError("Custom Value [%s] is smaller than the minimum allowed [%s]" % (custom_value, self.custom_min))
+            #Max
+            if self.custom_max and int(self.custom_max) < int(custom_value):
+                raise ValidationError("Custom Value [%s] is bigger than the maximum allowed [%s]" % (custom_value, self.custom_max))
+
+        if self.custom_type == 'float':
+            #Type
             try:
-                int(custom_value)
+                float(custom_value)
             except ValueError:
                 raise ValidationError("Custom Value [%s] cannot be converted to a float" % custom_value)
-        #//TODO: Handle min + max
-
-
-class ProductAttributeCustomValue(models.Model):
-    _inherit = "product.attribute.custom.value"
-
-
-"""    @api.constrains('custom_value')
-    def _check_custom_value(self):
-        for record in self:
-            raise ValidationError("Hello Damien Constrains")
-
-    @api.onchange('custom_value')
-    def _onchange_custom_value(self):
-        for record in self:
-            record.custom_value = None
-            #raise ValidationError("Hello Damien OnChange")
-            return {
-                'warning': {
-                    'title': "Something bad happened",
-                    'message': "It was very bad indeed",
-                }
-            }
-            #raise Warning("Hello OnChange2")
-
-
-   custom_value_char = fields.Char("Custom Value", compute='_compute_custom_value_char')
-    custom_value_int = fields.Integer("Custom Value", compute='_compute_custom_value_int', inverse='_compute_custom_value_int')
-
-    def _compute_custom_value_char(self):
-        for record in self:
-            if not record.custom_product_template_attribute_value_id.product_attribute_value_id.input_type == 'char':
-                record.custom_value_char = None
-            else:
-                record.custom_value_char = record.custom_value
-
-    def _compute_custom_value_int(self):
-        for record in self:
-            if not record.custom_product_template_attribute_value_id.product_attribute_value_id.input_type == 'int':
-                record.custom_value_int = None
-            else:
-                record.custom_value_int = int(record.custom_value)
-"""
+            #Min
+            if self.custom_min and float(self.custom_min) > float(custom_value):
+                raise ValidationError("Custom Value [%s] is smaller than the minimum allowed [%s]" % (custom_value, self.custom_min))
+            #Max
+            if self.custom_max and float(self.custom_max) < float(custom_value):
+                raise ValidationError("Custom Value [%s] is bigger than the maximum allowed [%s]" % (custom_value, self.custom_max))
