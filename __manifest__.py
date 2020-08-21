@@ -7,6 +7,7 @@
     'category': 'Product',
     'description': 'Add user input attribute type, similar to custom value',
     'data': [
+        'views/assets.xml',
         'views/product_attribute_views.xml',
     ],
     'installable': True,

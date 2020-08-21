@@ -1,7 +1,7 @@
 # Copyright 2020 Pafnow
 
 from odoo import api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, Warning
 
 
 class ProductAttribute(models.Model):
@@ -102,8 +102,28 @@ class ProductAttributeValue(models.Model):
 class ProductAttributeCustomValue(models.Model):
     _inherit = "product.attribute.custom.value"
 
-    custom_value_char = fields.Char("Custom Value", compute='_compute_custom_value_char')
-    custom_value_int = fields.Integer("Custom Value", compute='_compute_custom_value_int')
+
+"""    @api.constrains('custom_value')
+    def _check_custom_value(self):
+        for record in self:
+            raise ValidationError("Hello Damien Constrains")
+
+    @api.onchange('custom_value')
+    def _onchange_custom_value(self):
+        for record in self:
+            record.custom_value = None
+            #raise ValidationError("Hello Damien OnChange")
+            return {
+                'warning': {
+                    'title': "Something bad happened",
+                    'message': "It was very bad indeed",
+                }
+            }
+            #raise Warning("Hello OnChange2")
+
+
+   custom_value_char = fields.Char("Custom Value", compute='_compute_custom_value_char')
+    custom_value_int = fields.Integer("Custom Value", compute='_compute_custom_value_int', inverse='_compute_custom_value_int')
 
     def _compute_custom_value_char(self):
         for record in self:
@@ -118,3 +138,4 @@ class ProductAttributeCustomValue(models.Model):
                 record.custom_value_int = None
             else:
                 record.custom_value_int = int(record.custom_value)
+"""
