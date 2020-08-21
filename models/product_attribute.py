@@ -16,14 +16,14 @@ class ProductAttribute(models.Model):
     ], default='list', required=True, compute='_compute_attribute_type', inverse='_inverse_attribute_type')
 
     custom_value_id = fields.Many2one('product.attribute.value', compute='_compute_custom_value_id')
-    custom_value_input_min = fields.Char(related='custom_value_id.input_min', readonly=False)
-    custom_value_input_max = fields.Char(related='custom_value_id.input_max', readonly=False)
+    custom_value_min = fields.Char(related='custom_value_id.custom_min', readonly=False)
+    custom_value_max = fields.Char(related='custom_value_id.custom_max', readonly=False)
 
-    @api.depends('custom_value_id', 'custom_value_id.input_type')
+    @api.depends('custom_value_id', 'custom_value_id.custom_type')
     def _compute_attribute_type(self):
         for record in self:
-            if record.custom_value_id and record.custom_value_id.input_type:
-                record.attribute_type = record.custom_value_id.input_type
+            if record.custom_value_id and record.custom_value_id.custom_type:
+                record.attribute_type = record.custom_value_id.custom_type
             else:
                 record.attribute_type = 'list'
 
@@ -34,7 +34,7 @@ class ProductAttribute(models.Model):
 
             if v_attribute_type == 'list':
                 if record.custom_value_id:
-                    record.custom_value_id.input_type = None
+                    record.custom_value_id.custom_type = None
             else:
                 #Create custom value record if no record
                 if not len(record.value_ids):
@@ -44,7 +44,7 @@ class ProductAttribute(models.Model):
                     })]
                 if not record.custom_value_id:
                     raise ValidationError("Please delete all attribute values before changing Attribute Type (no custom value found).")
-                record.custom_value_id.input_type = v_attribute_type
+                record.custom_value_id.custom_type = v_attribute_type
                 record.display_type = 'radio'
                 record.create_variant = 'no_variant'
 
@@ -60,41 +60,41 @@ class ProductAttribute(models.Model):
 class ProductAttributeValue(models.Model):
     _inherit = "product.attribute.value"
 
-    input_type = fields.Selection([
+    custom_type = fields.Selection([
         ('char', 'Char'),
         ('int', 'Integer'),
         ('float', 'Float'),
     ])
-    input_min = fields.Char("Min Value")
-    input_max = fields.Char("Max Value")
+    custom_min = fields.Char("Min Value")
+    custom_max = fields.Char("Max Value")
 
-    @api.constrains('input_type', 'input_min')
-    def _check_input_min(self):
-        """ Ensure input_min is of the same type than input_type """
+    @api.constrains('custom_type', 'custom_min')
+    def _check_custom_min(self):
+        """ Ensure custom_min is of the same type than custom_type """
         for record in self:
-            if record.input_min and record.input_type == 'int':
+            if record.custom_min and record.custom_type == 'int':
                 try:
-                    int(record.input_min)
+                    int(record.custom_min)
                 except ValueError:
                     raise ValidationError("Min Value cannot be converted to an integer")
-            if record.input_min and record.input_type == 'float':
+            if record.custom_min and record.custom_type == 'float':
                 try:
-                    float(record.input_min)
+                    float(record.custom_min)
                 except ValueError:
                     raise ValidationError("Min Value cannot be converted to a float")
 
-    @api.constrains('input_type', 'input_max')
-    def _check_input_max(self):
-        """ Ensure input_max is of the same type than input_type """
+    @api.constrains('custom_type', 'custom_max')
+    def _check_custom_max(self):
+        """ Ensure custom_max is of the same type than custom_type """
         for record in self:
-            if record.input_max and record.input_type == 'int':
+            if record.custom_max and record.custom_type == 'int':
                 try:
-                    int(record.input_max)
+                    int(record.custom_max)
                 except ValueError:
                     raise ValidationError("Max Value cannot be converted to an integer")
-            if record.input_max and record.input_type == 'float':
+            if record.custom_max and record.custom_type == 'float':
                 try:
-                    float(record.input_max)
+                    float(record.custom_max)
                 except ValueError:
                     raise ValidationError("Max Value cannot be converted to a float")
 

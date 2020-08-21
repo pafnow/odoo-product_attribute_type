@@ -33,8 +33,8 @@
             </xpath>
             <xpath expr="//field[@name='value_ids']" position="after">
                 <group attrs="{'invisible': [('attribute_type', '=', 'list')]}">
-                    <field name="custom_value_input_min" />
-                    <field name="custom_value_input_max" />
+                    <field name="custom_value_min" />
+                    <field name="custom_value_max" />
                 </group>
             </xpath>
         </field>
